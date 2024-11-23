@@ -43,6 +43,7 @@ def data_load():
     train_features['filepath'] = local_dir + train_features['filepath']
     test_features['filepath'] = local_dir + test_features['filepath']
 
+    print('data load: succesful')
     return train_features, train_labels, test_features
 
 
@@ -67,6 +68,9 @@ def data_split(
         ,test_size=test_size
     )
 
+
+    print (x_train.shape, x_eval.shape, y_train.shape, y_eval.shape)
+    print('data split: successful')
     return x_train, x_eval, y_train, y_eval
 
 
@@ -77,7 +81,7 @@ def data_preprocess(
         ):
 
 
-    batch_size = config['data_loader']['batch_size']
+    batch_size = config['data_preprocess']['batch_size']
 
     train_dataset = ImagesDataset(
         x_train
@@ -88,7 +92,8 @@ def data_preprocess(
         train_dataset
         ,batch_size=batch_size # can be adjusted in yaml
         )
-
+    
+    print('data preprocess: successful')
     return train_dataloader
 
 
@@ -112,14 +117,30 @@ def train_model(
     Returns:
         pd.Series: Series containing tracked losses
     """
+    # Load the YAML configuration inside of train_model() not sure why need it but it will bug if not
+    with open("configs/config.yaml", "r") as file:
+        config = yaml.safe_load(file)
+
+
 
     num_epochs = config['train']['num_epochs']
     device = config['train']['device']
     model_save_path = config['train']['model_save_path']
 
-    model = CustomViT.vit_model
-    optimizer = CustomOptimizer.adm_optimizer
-    criterion = CustomLoss.criterion
+
+    model = CustomViT(
+        config=config
+        ).get_vit_model()
+    print('model get: successful')
+
+    optimizer = CustomOptimizer(
+        config=config
+    ).get_optimizer()
+    print('optmizer get: successful')
+
+    criterion = CustomLoss().get_loss()
+    print('loss function get: successful')
+
     str_today = str(date.today())
 
 
@@ -166,6 +187,7 @@ def train_model(
     torch.save(model, f'{model_save_path}_{str_today}.pth')
     print(f"\nModel saved to f{model_save_path}_{str_today}")
     
+    print('model training: successful')
     return tracking_loss
 
 

@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from torch.optim import Adam
-from vit import CustomViT
+from src.models.vit import CustomViT
 
 
 class CustomOptimizer(nn.Module):
@@ -18,9 +18,16 @@ class CustomOptimizer(nn.Module):
 
         lr = config['adam_optimizer_hyper_p']['lr']
 
-        params = CustomViT.vit_model.parameters()
+
+        params = CustomViT(
+            config=config
+        ).vit_model.parameters()
 
         self.adm_optimizer = Adam(
             params=params
             ,lr=lr
             )
+        
+    def get_optimizer(self):
+        """Return the vit_model."""
+        return self.adm_optimizer

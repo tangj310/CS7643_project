@@ -14,7 +14,7 @@ class CustomViT(nn.Module):
     """
 
 
-    def __init__(self, config, num_classes):
+    def __init__(self, config):
         """
         Initialize the model with 8 classes target .
         
@@ -30,6 +30,7 @@ class CustomViT(nn.Module):
         hidden_dim = config['vit_hyper_p']['hidden_dim']
         mlp_dim = config['vit_hyper_p']['mlp_dim']
         dropout = config['vit_hyper_p']['dropout']
+        num_classes = config['vit_hyper_p']['num_classes']
 
 
         self.vit_model = VisionTransformer(
@@ -50,3 +51,7 @@ class CustomViT(nn.Module):
         # Access the last classification layer and modify it
         in_features = self.vit_model.heads[0].in_features  # Access the first layer in 'heads'
         self.vit_model.heads = nn.Linear(in_features, num_classes)
+
+    def get_vit_model(self):
+        """Return the vit_model."""
+        return self.vit_model
