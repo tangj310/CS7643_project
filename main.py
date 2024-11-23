@@ -7,6 +7,19 @@ from src.models.resnet50 import CustomResNet50
 from src.training.train import train_model, plot_loss
 from torch.optim import Adam
 from torch.nn import BCEWithLogitsLoss
+import yaml
+
+# Load the YAML configuration
+with open("configs/config.yaml", "r") as file:
+    config = yaml.safe_load(file)
+
+
+num_epochs = config['train']['num_epochs']
+device = config['train']['device']
+model_save_path = config['train']['model_save_path']
+plt_pic_save_path = config['train']['plt_pic_save_path']
+
+
 
 def main():
     # Prepare datasets
@@ -38,13 +51,14 @@ def main():
         train_dataloader=train_loader,
         criterion=criterion,
         optimizer=optimizer,
-        num_epochs=1,
-        device='cpu',
-        save_path='model_checkpoint/model.pth'
+        num_epochs=num_epochs,
+        device=device,
+        save_path=model_save_path
     )
 
+
     # Plot and save loss
-    plot_loss(tracking_loss, save_path='training_loss.png')
+    plot_loss(tracking_loss, plt_pic_save_path='training_loss.png')
         
     
 

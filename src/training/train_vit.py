@@ -4,12 +4,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 import yaml
-
-# Load the YAML configuration
-with open("configs/config.yaml", "r") as file:
-    config = yaml.safe_load(file)
+from datetime import date
 
 
+
+str_today = str(date.today())
 
 
 def train_model(
@@ -17,9 +16,9 @@ def train_model(
     train_dataloader,
     criterion,
     optimizer,
-    num_epochs = 1,
-    device = 'cpu',
-    save_path = 'model_checkpoint/model.pth'
+    num_epochs,
+    device,
+    model_save_path
 ):
     """
     Train the model and track losses.
@@ -96,12 +95,13 @@ def train_model(
     plt.title("Training Loss Over Time")
     
     # Save model
-    torch.save(model, save_path)
-    print(f"\nModel saved to {save_path}")
+    torch.save(model, f'{model_save_path}_{str_today}.pth')
+    print(f"\nModel saved to f{model_save_path}_{str_today}.pth")
     
     return tracking_loss
 
-def plot_loss(tracking_loss: pd.Series, save_path: str = None):
+
+def plot_loss(tracking_loss: pd.Series, plt_pic_save_path: str = None):
     """
     Plot training loss.
     
@@ -122,7 +122,7 @@ def plot_loss(tracking_loss: pd.Series, save_path: str = None):
     plt.legend(loc=0)
     plt.title("Training Loss Over Time")
     
-    if save_path:
-        plt.savefig(save_path)
-        print(f"Loss plot saved to {save_path}")
+    if plt_pic_save_path:
+        plt.savefig(plt_pic_save_path)
+        print(f"Loss plot saved to {plt_pic_save_path}")
 

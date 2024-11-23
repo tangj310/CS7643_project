@@ -19,3 +19,11 @@ vit_hyper_p:
 
 adam_optimizer_hyper_p:
   lr: 1e-4
+
+
+
+train:
+  num_epochs: 1
+  device: 'cpu'
+  model_save_path: 'model/'
+  plt_pic_save_path: 'plt_pic/'

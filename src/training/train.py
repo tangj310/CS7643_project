@@ -3,12 +3,50 @@ from tqdm import tqdm
 import pandas as pd
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
+from sklearn.model_selection import train_test_split
 import yaml
+
+
+
 
 # Load the YAML configuration
 with open("configs/config.yaml", "r") as file:
     config = yaml.safe_load(file)
 
+
+frac = config['data_split']['frac']
+test_size = config['data_split']['test_size']
+
+
+
+def data_load():
+# change directory
+
+    local_dir = 'E:/University-Georgia Tech/CS7643_deeplearning/groupproject/competition_VfIpjyh/'
+
+    train_features = pd.read_csv(local_dir + "train_features.csv", index_col="id")
+    test_features = pd.read_csv(local_dir + "test_features.csv", index_col="id")
+    train_labels = pd.read_csv(local_dir + "train_labels.csv", index_col="id")
+
+    train_features['filepath'] = train_features['filepath'].str.replace('/data', '', regex=False)
+    test_features['filepath'] = test_features['filepath'].str.replace('/data', '', regex=False)
+
+    train_features['filepath'] = local_dir + train_features['filepath']
+    test_features['filepath'] = local_dir + test_features['filepath']
+
+    return train_features, train_labels, test_features
+
+
+
+def train_test_split():
+
+    y = data_load()[1].sample(frac=frac, random_state=1)
+    x = data_load()[0].loc[y.index].filepath.to_frame()
+
+    # note that we are casting the species labels to an indicator/dummy matrix
+    x_train, x_eval, y_train, y_eval = train_test_split(
+        x, y, stratify=y, test_size=0.25
+    )
 
 
 
