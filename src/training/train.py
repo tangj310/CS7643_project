@@ -15,6 +15,11 @@ from src.models.resnet50 import CustomResNet50
 from src.models.optimizer import CustomOptimizer
 from src.models.loss import CustomLoss
 
+
+# global params
+str_today = str(date.today())
+
+
 # Load the YAML configuration
 with open("configs/config.yaml", "r") as file:
     config = yaml.safe_load(file)
@@ -42,14 +47,17 @@ def data_load():
 
 
 
-def data_split():
+def data_split(
+        train_features
+        ,train_labels
+        ):
 
     # load yaml parameters
     frac = config['data_split']['frac']
     test_size = config['data_split']['test_size']
 
-    y = data_load()[1].sample(frac=frac, random_state=1)
-    x = data_load()[0].loc[y.index].filepath.to_frame()
+    y = train_labels.sample(frac=frac, random_state=1)
+    x = train_features.loc[y.index].filepath.to_frame()
 
     # note that we are casting the species labels to an indicator/dummy matrix
     x_train, x_eval, y_train, y_eval = train_test_split(
@@ -63,14 +71,17 @@ def data_split():
 
 
 
-def data_preprocess():
+def data_preprocess(
+        x_train
+        ,y_train
+        ):
 
 
     batch_size = config['data_loader']['batch_size']
 
     train_dataset = ImagesDataset(
-        data_split()[0]
-        ,data_split()[2]
+        x_train
+        ,y_train
         )
     
     train_dataloader = DataLoader(
@@ -83,15 +94,9 @@ def data_preprocess():
 
 
 def train_model(
-    config
-    ,model
-    ,train_dataloader
-    ,criterion
-    ,optimizer
-    ,num_epochs
-    ,device
-    ,model_save_path
-    ):
+        train_dataloader
+        ):
+
     """
     Train the model and track losses.
     
@@ -108,7 +113,8 @@ def train_model(
         pd.Series: Series containing tracked losses
     """
 
-
+    num_epochs = config['train']['num_epochs']
+    device = config['train']['device']
     model_save_path = config['train']['model_save_path']
 
     model = CustomViT.vit_model
@@ -155,27 +161,18 @@ def train_model(
     # Convert tracking_loss to pandas Series
     tracking_loss = pd.Series(tracking_loss)
     
-    # Plot losses
-    plt.figure(figsize=(10, 5))
-    tracking_loss.plot(alpha=0.2, label="loss")
-    tracking_loss.rolling(
-        center=True, 
-        min_periods=1, 
-        window=10
-    ).mean().plot(label="loss (moving avg)")
-    
-    plt.xlabel("(Epoch, Batch)")
-    plt.ylabel("Loss")
-    plt.legend(loc=0)
-    plt.title("Training Loss Over Time")
-    
+
     # Save model
     torch.save(model, f'{model_save_path}_{str_today}.pth')
-    print(f"\nModel saved to f{model_save_path}_{str_today}.pth")
+    print(f"\nModel saved to f{model_save_path}_{str_today}")
     
     return tracking_loss
 
-def plot_loss(tracking_loss: pd.Series, save_path: str = None):
+
+
+def plot_loss(
+        tracking_loss: pd.Series
+        ,save_path: str = None):
     """
     Plot training loss.
     
@@ -183,6 +180,9 @@ def plot_loss(tracking_loss: pd.Series, save_path: str = None):
         tracking_loss: Series containing loss values
         save_path: Optional path to save the plot
     """
+
+    plt_pic_save_path = config['train']['plt_pic_save_path']
+
     plt.figure(figsize=(10, 5))
     tracking_loss.plot(alpha=0.2, label="loss")
     tracking_loss.rolling(
@@ -197,6 +197,8 @@ def plot_loss(tracking_loss: pd.Series, save_path: str = None):
     plt.title("Training Loss Over Time")
     
     if save_path:
-        plt.savefig(save_path)
-        print(f"Loss plot saved to {save_path}")
+        plt.savefig(f'{plt_pic_save_path}_{str_today}.png')
+        print(f"Loss plot saved to {plt_pic_save_path}_{str_today}")
+
+    return
 
