@@ -20,7 +20,7 @@ class CustomOptimizer(nn.Module):
 
         params = CustomViT.vit_model.parameters()
 
-        self.optimizer = Adam(
+        self.adm_optimizer = Adam(
             params=params
             ,lr=lr
             )

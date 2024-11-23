@@ -2,27 +2,31 @@ import torch
 from tqdm import tqdm
 import pandas as pd
 import matplotlib.pyplot as plt
-from torch.utils.data import DataLoader
 from sklearn.model_selection import train_test_split
 import yaml
+from datetime import date
 
-
-
+from torch.utils.data import Dataset
+from torchvision import transforms
+from torch.utils.data import DataLoader
+from src.models.dataops import ImagesDataset
+from src.models.vit import CustomViT
+from src.models.resnet50 import CustomResNet50
+from src.models.optimizer import CustomOptimizer
+from src.models.loss import CustomLoss
 
 # Load the YAML configuration
 with open("configs/config.yaml", "r") as file:
     config = yaml.safe_load(file)
 
 
-frac = config['data_split']['frac']
-test_size = config['data_split']['test_size']
-
 
 
 def data_load():
-# change directory
 
-    local_dir = 'E:/University-Georgia Tech/CS7643_deeplearning/groupproject/competition_VfIpjyh/'
+    # load yaml parameters
+    local_dir = config['data_load']['local_dir']
+
 
     train_features = pd.read_csv(local_dir + "train_features.csv", index_col="id")
     test_features = pd.read_csv(local_dir + "test_features.csv", index_col="id")
@@ -38,27 +42,56 @@ def data_load():
 
 
 
-def train_test_split():
+def data_split():
+
+    # load yaml parameters
+    frac = config['data_split']['frac']
+    test_size = config['data_split']['test_size']
 
     y = data_load()[1].sample(frac=frac, random_state=1)
     x = data_load()[0].loc[y.index].filepath.to_frame()
 
     # note that we are casting the species labels to an indicator/dummy matrix
     x_train, x_eval, y_train, y_eval = train_test_split(
-        x, y, stratify=y, test_size=0.25
+        x
+        ,y
+        ,stratify=y
+        ,test_size=test_size
     )
+
+    return x_train, x_eval, y_train, y_eval
+
+
+
+def data_preprocess():
+
+
+    batch_size = config['data_loader']['batch_size']
+
+    train_dataset = ImagesDataset(
+        data_split()[0]
+        ,data_split()[2]
+        )
+    
+    train_dataloader = DataLoader(
+        train_dataset
+        ,batch_size=batch_size # can be adjusted in yaml
+        )
+
+    return train_dataloader
 
 
 
 def train_model(
-    model,
-    train_dataloader,
-    criterion,
-    optimizer,
-    num_epochs = 1,
-    device = 'cpu',
-    save_path = 'model_checkpoint/model.pth'
-):
+    config
+    ,model
+    ,train_dataloader
+    ,criterion
+    ,optimizer
+    ,num_epochs
+    ,device
+    ,model_save_path
+    ):
     """
     Train the model and track losses.
     
@@ -74,47 +107,50 @@ def train_model(
     Returns:
         pd.Series: Series containing tracked losses
     """
-    # Move model to device
-    
-    model = model.to(device)
-    model.train()
-    
-    # Dictionary to track losses
-    tracking_loss = {}
-    
+
+
+    model_save_path = config['train']['model_save_path']
+
+    model = CustomViT.vit_model
+    optimizer = CustomOptimizer.adm_optimizer
+    criterion = CustomLoss.criterion
+    str_today = str(date.today())
+
+
+
     # Training loop
+    tracking_loss = {}
+
     for epoch in range(1, num_epochs + 1):
-        print(f"\nStarting epoch {epoch}")
-        
-        # Iterate through batches with progress bar
+        print(f"Starting epoch {epoch}")
+
+        # iterate through the dataloader batches. tqdm keeps track of progress.
         for batch_n, batch in tqdm(
-            enumerate(train_dataloader), 
-            total=len(train_dataloader),
-            desc=f'Epoch {epoch}/{num_epochs}'
+            enumerate(train_dataloader), total=len(train_dataloader)
         ):
-            # Move batch to device
-            images = batch["image"].to(device)
-            labels = batch["label"].to(device)
+            print(batch_n) # total 2473 pics
             
-            # 1) Zero gradients
-            optimizer.zero_grad()
-            
-            # 2) Forward pass
-            outputs = model(images)
-            
-            # 3) Compute loss
-            loss = criterion(outputs, labels)
-            tracking_loss[(epoch, batch_n)] = float(loss)
-            
-            # 4) Backward pass
-            loss.backward()
-            
-            # 5) Update weights
-            optimizer.step()
-            
-        # Print epoch loss
-        epoch_loss = sum(v for k, v in tracking_loss.items() if k[0] == epoch) / len(train_dataloader)
-        print(f"Epoch {epoch} average loss: {epoch_loss:.4f}")
+            model.train()
+            loss = 0.0
+            for batch in train_dataloader:
+                images = batch["image"].to(device)
+                labels = batch["label"].to(device)
+
+                # Forward pass
+                outputs = model(images)
+
+                loss = criterion(outputs, labels)
+                
+                # let's keep track of the loss by epoch and batch|
+                tracking_loss[(epoch, batch_n)] = float(loss)
+                # Backward pass and optimization
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+
+                loss += loss.item()
+
+            print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {loss / len(train_dataloader):.4f}")
     
     # Convert tracking_loss to pandas Series
     tracking_loss = pd.Series(tracking_loss)
@@ -134,8 +170,8 @@ def train_model(
     plt.title("Training Loss Over Time")
     
     # Save model
-    torch.save(model, save_path)
-    print(f"\nModel saved to {save_path}")
+    torch.save(model, f'{model_save_path}_{str_today}.pth')
+    print(f"\nModel saved to f{model_save_path}_{str_today}.pth")
     
     return tracking_loss
 
