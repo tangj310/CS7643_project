@@ -52,7 +52,6 @@ def main():
 
 
 
-
     # Plot and save loss
     plot_loss(
         tracking_loss
