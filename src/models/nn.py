@@ -1,9 +1,9 @@
-# src/models/model.py
 import torch.nn as nn
 import torchvision.models as models
-from torchvision.models import ResNet50_Weights  # Import weights
+from torchvision.models.efficientnet import EfficientNet
+from torchvision.models.resnet import ResNet
 
-class CustomResNet50(nn.Module):
+class CustomNN(nn.Module):
     """
     Custom ResNet50 model with modified head for multi-label classification.
     
@@ -33,17 +33,6 @@ class CustomResNet50(nn.Module):
             nn.Linear(100, 8)
         )
     
-    def forward(self, x):
-        """
-        Forward pass through the network.
-        
-        Args:
-            x (torch.Tensor): Input tensor of shape (batch_size, channels, height, width)
-        
-        Returns:
-            torch.Tensor: Output tensor of shape (batch_size, num_classes)
-        """
-        return self.resnet(x)
     
     
 
