@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import yaml
 
 
 
@@ -12,9 +11,16 @@ class CustomLoss(nn.Module):
     """
 
 
-    def __init__(self):
+    def __init__(self, config):
         super(CustomLoss, self).__init__() # Initialize the parent nn.Module
-        self.criterion = nn.BCEWithLogitsLoss()  # Use BCEWithLogitsLoss for multi-label classification
+
+        loss_name = config['loss_name']
+
+        if loss_name == 'CrossEntropyLoss':
+            self.criterion = nn.CrossEntropyLoss()
+
+        if loss_name == 'BCEWithLogitsLoss':
+            self.criterion = nn.BCEWithLogitsLoss()  # Use BCEWithLogitsLoss for multi-label classification
 
 
 

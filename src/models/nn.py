@@ -3,11 +3,7 @@ import torchvision.models as models
 from torchvision.models import ResNet50_Weights, EfficientNet_B0_Weights
 from torchvision.models.efficientnet import EfficientNet
 from torchvision.models.resnet import ResNet
-import yaml
 
-# Load the YAML configuration
-with open("configs/config.yaml", "r") as file:
-    config = yaml.safe_load(file)
 
 
 

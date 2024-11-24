@@ -153,7 +153,9 @@ def train_model(
     ).get_optimizer()
     print('optmizer get: successful')
 
-    criterion = CustomLoss().get_loss()
+    criterion = CustomLoss(
+        config=config
+    ).get_loss()
     print('loss function get: successful')
 
     str_today = str(date.today())

@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torch.optim import Adam
 from torchvision.models import VisionTransformer  # define own transformers
-import yaml
+
 
 
 

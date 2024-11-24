@@ -3,7 +3,7 @@ data_load:
   local_dir: 'E:/University-Georgia Tech/CS7643_deeplearning/groupproject/competition_VfIpjyh/'
 
 data_split:
-  frac: 0.5
+  frac: 0.1
   test_size: 0.25
 
 data_preprocess:
@@ -14,6 +14,8 @@ data_preprocess:
 model_name: 'RestNet' # 'RestNet', 'EfficientNet'
 
 optimizer_name: 'SGD' # 'SGD', 'Adam'
+
+loss_name: 'CrossEntropyLoss' # 'BCEWithLogitsLoss'
 
 
 vit_hyper_p:
