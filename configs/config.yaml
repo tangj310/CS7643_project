@@ -2,18 +2,18 @@
 data_load:
   local_dir: 'E:/University-Georgia Tech/CS7643_deeplearning/groupproject/competition_VfIpjyh/'
 
-
 data_split:
   frac: 0.5
   test_size: 0.25
 
-
 data_preprocess:
   batch_size: 4
 
-model_name: 'CustomViT'
 
-optimizer_name: 'Adam'
+
+model_name: 'RestNet' # 'RestNet', 'EfficientNet'
+
+optimizer_name: 'SGD' # 'SGD', 'Adam'
 
 
 vit_hyper_p:
@@ -26,13 +26,12 @@ vit_hyper_p:
   dropout: 0.1      # Dropout rate
   num_classes: 8
 
-
-
-
-adam_optimizer_hyper_p:
+optimizer_hyper_p:
   lr: 0.0001
+  momentum: 0.9
 
 
+### training parameters ###
 train:
   num_epochs: 1
   device: 'cpu'

@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
-from torch.optim import Adam
+from torch.optim import Adam, SGD
 from src.models.vit import CustomViT
-
+from src.models.nn import CustomNN
 
 class CustomOptimizer(nn.Module):
     """
@@ -18,21 +18,33 @@ class CustomOptimizer(nn.Module):
 
 
         optimizer_name = config['optimizer_name']
+        lr = config['optimizer_hyper_p']['lr']
+        momentum = config['optimizer_hyper_p']['momentum']
 
         if optimizer_name == 'Adam':
 
-            lr = config['adam_optimizer_hyper_p']['lr']
-
             params = CustomViT(
                 config=config
-            ).vit_model.parameters()
+            ).model.parameters()
 
             self.optimizer = Adam(
                 params=params
                 ,lr=lr
                 )
+            
+        if optimizer_name == 'SGD':
+
+            params = CustomNN(
+                config=config
+            ).model.parameters()
+
+            self.optimizer = SGD(
+                params=params
+                ,lr=lr
+                ,momentum=momentum
+                )
         
 
     def get_optimizer(self):
-        """Return the vit_model."""
+        """Return the optmizer."""
         return self.optimizer

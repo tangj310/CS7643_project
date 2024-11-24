@@ -33,25 +33,25 @@ class CustomViT(nn.Module):
         num_classes = config['vit_hyper_p']['num_classes']
 
 
-        self.vit_model = VisionTransformer(
-                                            image_size=image_size  # Input image size (224x224)
-                                            ,patch_size=patch_size   # Patch size
-                                            ,num_layers=num_layers
-                                            ,num_classes=num_classes  # Number of classes for classification
-                                            ,num_heads=num_heads     # Number of attention heads
-                                            ,hidden_dim=hidden_dim
-                                            ,mlp_dim=mlp_dim     # Dimension of MLP layers
-                                            ,dropout=dropout     # Dropout rate
+        self.model = VisionTransformer(
+                                        image_size=image_size  # Input image size (224x224)
+                                        ,patch_size=patch_size   # Patch size
+                                        ,num_layers=num_layers
+                                        ,num_classes=num_classes  # Number of classes for classification
+                                        ,num_heads=num_heads     # Number of attention heads
+                                        ,hidden_dim=hidden_dim
+                                        ,mlp_dim=mlp_dim     # Dimension of MLP layers
+                                        ,dropout=dropout     # Dropout rate
                                             )
         
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.vit_model = self.vit_model.to(device)
+        self.model = self.model.to(device)
 
         # Access the last classification layer and modify it
-        in_features = self.vit_model.heads[0].in_features  # Access the first layer in 'heads'
-        self.vit_model.heads = nn.Linear(in_features, num_classes)
+        in_features = self.model.heads[0].in_features  # Access the first layer in 'heads'
+        self.model.heads = nn.Linear(in_features, num_classes)
 
     def get_model(self):
         """Return the vit_model."""
-        return self.vit_model
+        return self.model

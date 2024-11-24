@@ -139,8 +139,13 @@ def train_model(
         model = CustomNN(
             config=config
         ).get_model()
-        print('CustomNN model get: successful')
+        print('RestNet model get: successful')
 
+    if model_name == 'EfficientNet':
+        model = CustomNN(
+            config=config
+        ).get_model()
+        print('EfficientNet model get: successful')
 
 
     optimizer = CustomOptimizer(
@@ -165,7 +170,7 @@ def train_model(
         for batch_n, batch in tqdm(
             enumerate(train_dataloader), total=len(train_dataloader)
         ):
-            print(batch_n) # total 2473 pics
+            print(batch_n) 
             
             model.train()
             loss = 0.0

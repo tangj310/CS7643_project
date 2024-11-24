@@ -15,14 +15,12 @@ class CustomNN(nn.Module):
     """
 
     """
-    def __init__(self
-                 ,model_name: str
-                 ):
+    def __init__(self, config):
         """
         Initialize the model with 8 classes target .
         
         """
-        super().__init__()
+        super(CustomNN, self).__init__()
         
         model_name = config['model_name']
 
@@ -33,11 +31,9 @@ class CustomNN(nn.Module):
                 )
   
 
-
-
         if model_name == 'EfficientNet':
 
-            self.model = models.efficientnet(
+            self.model = models.efficientnet_v2_l(
                 pretrained=True
                 )
             
