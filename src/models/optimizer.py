@@ -16,18 +16,23 @@ class CustomOptimizer(nn.Module):
 
         super(CustomOptimizer, self).__init__()
 
-        lr = config['adam_optimizer_hyper_p']['lr']
 
+        optimizer_name = config['optimizer_name']
 
-        params = CustomViT(
-            config=config
-        ).vit_model.parameters()
+        if optimizer_name == 'Adam':
 
-        self.adm_optimizer = Adam(
-            params=params
-            ,lr=lr
-            )
+            lr = config['adam_optimizer_hyper_p']['lr']
+
+            params = CustomViT(
+                config=config
+            ).vit_model.parameters()
+
+            self.optimizer = Adam(
+                params=params
+                ,lr=lr
+                )
         
+
     def get_optimizer(self):
         """Return the vit_model."""
-        return self.adm_optimizer
+        return self.optimizer

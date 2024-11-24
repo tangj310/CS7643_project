@@ -1,7 +1,6 @@
 
 import torch
 from torch.utils.data import DataLoader
-from src.models.resnet50 import CustomResNet50
 from src.training.train import *
 from torch.optim import Adam
 from torch.nn import BCEWithLogitsLoss

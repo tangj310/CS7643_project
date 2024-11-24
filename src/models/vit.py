@@ -52,6 +52,6 @@ class CustomViT(nn.Module):
         in_features = self.vit_model.heads[0].in_features  # Access the first layer in 'heads'
         self.vit_model.heads = nn.Linear(in_features, num_classes)
 
-    def get_vit_model(self):
+    def get_model(self):
         """Return the vit_model."""
         return self.vit_model

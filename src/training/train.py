@@ -11,7 +11,7 @@ from torchvision import transforms
 from torch.utils.data import DataLoader
 from src.models.dataops import ImagesDataset
 from src.models.vit import CustomViT
-from src.models.resnet50 import CustomResNet50
+from src.models.nn import CustomNN
 from src.models.optimizer import CustomOptimizer
 from src.models.loss import CustomLoss
 
@@ -126,12 +126,22 @@ def train_model(
     num_epochs = config['train']['num_epochs']
     device = config['train']['device']
     model_save_path = config['train']['model_save_path']
+    model_name = config['model_name']
 
 
-    model = CustomViT(
-        config=config
-        ).get_vit_model()
-    print('model get: successful')
+    if model_name == 'CustomViT':
+        model = CustomViT(
+            config=config
+            ).get_model()
+        print('CustomViT model get: successful')
+
+    if model_name == 'RestNet':
+        model = CustomNN(
+            config=config
+        ).get_model()
+        print('CustomNN model get: successful')
+
+
 
     optimizer = CustomOptimizer(
         config=config
