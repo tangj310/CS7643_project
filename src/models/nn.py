@@ -20,7 +20,7 @@ class CustomNN(nn.Module):
         
         model_name = config['model_name']
 
-        if model_name == 'RestNet':
+        if model_name == 'ResNet':
 
             self.model = models.resnet50(
                 pretrained=True
