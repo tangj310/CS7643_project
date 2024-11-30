@@ -3,7 +3,7 @@ data_load:
   local_dir: 'E:/University-Georgia Tech/CS7643_deeplearning/groupproject/competition_VfIpjyh/'
 
 data_split:
-  frac: 0.1
+  frac: 0.8
   test_size: 0.25
 
 data_preprocess:
@@ -35,7 +35,7 @@ optimizer_hyper_p:
 
 ### training parameters ###
 train:
-  num_epochs: 1
+  num_epochs: 4
   device: 'cpu'
   model_save_path: 'model/'
   plt_pic_save_path: 'plt_pic/'
